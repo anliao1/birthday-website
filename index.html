@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <!-- Updated CSP for inline scripts and styles -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+    <title>Bunny Slots</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-image: url('./images/background9.png');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        color: #fff;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      h1 {
+        margin-bottom: 20px;
+        color: #FFD78C;
+        font-size: 40px;
+        font-family: 'Quicksand', sans-serif;
+      }
+      
+      /* Use your previously designed overlay container for spacing */
+      .overlay-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* Space between each frame wrapper */
+        height: 100%; /* Center vertically */
+        z-index: 1;
+        position: relative;
+      }
+      
+      /* Each frame-wrapper holds the reel and the overlaid frame image */
+      .frame-wrapper {
+        position: relative;
+        width: 250px; /* Same width as the overlay image */
+        height: 250px; /* Adjust height as needed to match frame design */
+        background: url('./images/slots.png') no-repeat center center;
+        background-size: contain;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* Each reel inside the frame */
+      .reel {
+        width: 200px; /* Slightly smaller than the frame so it fits inside */
+        height: 200px;
+        border: 2px solid #fff;
+        overflow: hidden;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* Styling for images inside reels */
+      .reel img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+      }
+      
+      /* The frame overlay positioned above the reel */
+      .frame-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none; /* So clicks pass through to the reel if needed */
+        z-index: 2;
+      }
+      
+      /* Lever button */
+      .lever {
+        position: absolute;
+        bottom: 225px;
+        margin-top: 20px;
+        cursor: pointer;
+        padding: 10px 40px;
+        background: url('./images/rectangle_white.png') no-repeat center center;
+        background-size: contain;
+        border: none; /* Remove border since it's a custom image */
+        color: #FFD78C;
+        font-size: 22px;
+        font-family: 'Quicksand', sans-serif;
+        z-index: 2;
+        text-align: center;
+        height: 80px; /* Set height and width to match your image's shape */
+        width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .top-text {
+        top: 80px;
+        /* adjust as needed */
+      }
+
+      .text-box {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 1.5rem;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        z-index: 2;
+        /* Makes sure clicks pass through */
+      }
+      
+      /* Arrow button common styles */
+      .arrow-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      
+      /* Specific override for the unlock button */
+      #unlockButton {
+        display: none;
+        position: relative;
+        margin-top: 20px;
+        padding: 10px 20px;
+      }
+      
+      /* Arrow image styles */
+      .arrow-button img {
+        width: 60px;
+        height: auto;
+        transition: transform 0.2s ease;
+      }
+      
+      .arrow-button:hover img {
+        transform: scale(1.2);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bunny Slots</h1>
+    <div class="text-box top-text">
+      <p>Get 3 Coco pictures in a row to progress!</p>
+    </div>
+    
+    <!-- Overlay container with each reel framed individually -->
+    <div class="overlay-container">
+      <div class="frame-wrapper">
+        <!-- Reel in the background -->
+        <div class="reel" id="reel1"></div>
+        <!-- Frame image on top -->
+        <img src="./images/slots.png" alt="Frame" class="frame-overlay">
+      </div>
+      <div class="frame-wrapper">
+        <div class="reel" id="reel2"></div>
+        <img src="./images/slots.png" alt="Frame" class="frame-overlay">
+      </div>
+      <div class="frame-wrapper">
+        <div class="reel" id="reel3"></div>
+        <img src="./images/slots.png" alt="Frame" class="frame-overlay">
+      </div>
+    </div>
+    
+    <!-- Lever button -->
+    <button class="lever" id="lever">Pull Lever</button>
+    
+    <!-- Unlock navigation button (goes to birthday.html) -->
+    <button id="unlockButton" class="arrow-button" onclick="location.href='birthday.html'">
+      <img src="./images/white-right-arrow.png" alt="Unlock Arrow">
+    </button>
+    
+    <script>
+      // Define the images for the slot machine.
+      const images = [
+        './images/bunny1.jpg',
+        './images/bunny2.jpeg',
+        './images/bunny3.jpeg'
+      ];
+      // Define winning image as bunny3 (index 2)
+      const winningIndex = 2;
+      
+      // Track the number of spins for the pity system
+      let rollCount = 0;
+      const maxRollsBeforePity = 15;
+      
+      const leverButton = document.getElementById('lever');
+      const unlockButton = document.getElementById('unlockButton');
+      
+      // Initialize reels with a random image for each reel
+      function initReels() {
+        for (let i = 1; i <= 3; i++) {
+          const reel = document.getElementById('reel' + i);
+          reel.innerHTML = '';
+          const img = document.createElement('img');
+          const randIndex = Math.floor(Math.random() * images.length);
+          img.src = images[randIndex];
+          reel.appendChild(img);
+        }
+      }
+      
+      // Function to simulate a spinning reel.
+      // It quickly cycles through images then stops on one.
+      // If forceWin is true, the final image is set to the winning image.
+      function spinReel(reelElement, onFinish, forceWin = false) {
+        let iterations = 20;  // How many times to change image
+        const spinInterval = setInterval(() => {
+          reelElement.innerHTML = '';
+          const img = document.createElement('img');
+          // Randomly select an image during the spin
+          const randIndex = Math.floor(Math.random() * images.length);
+          img.src = images[randIndex];
+          reelElement.appendChild(img);
+          iterations--;
+          if (iterations <= 0) {
+            clearInterval(spinInterval);
+            // Final image after spinning
+            const finalImg = document.createElement('img');
+            let finalIndex;
+            if (forceWin) {
+              finalIndex = winningIndex;
+            } else {
+              finalIndex = Math.floor(Math.random() * images.length);
+            }
+            finalImg.src = images[finalIndex];
+            reelElement.innerHTML = '';
+            reelElement.appendChild(finalImg);
+            if (onFinish) onFinish(finalIndex);
+          }
+        }, 50);
+      }
+      
+      // Function to spin all three reels
+      function spinAll() {
+        rollCount++;
+        unlockButton.style.display = 'none';
+        let results = [];
+        let reelsFinished = 0;
+      
+        // Determine if pity should force a win this spin
+        const forceWin = rollCount >= maxRollsBeforePity;
+      
+        function reelFinished(finalIndex) {
+          results.push(finalIndex);
+          reelsFinished++;
+          if (reelsFinished === 3) {
+            // Check for win: All reels must show the winning image index.
+            let win = results.every(index => index === winningIndex);
+            if (win) {
+              // Delay the alert by 500ms
+              setTimeout(() => {
+                alert('You WIN! Go to the next page!');
+                unlockButton.style.display = 'block';
+              }, 500);
+              rollCount = 0; // Reset the pity counter
+            }
+          }
+        }
+      
+        // Spin each reel individually
+        for (let i = 1; i <= 3; i++) {
+          const reel = document.getElementById('reel' + i);
+          spinReel(reel, reelFinished, forceWin);
+        }
+      }
+      
+      leverButton.addEventListener('click', spinAll);
+      initReels();
+    </script>
+  </body>
+</html>

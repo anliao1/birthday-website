@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+
+    <title>Birthday Page</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Background with blur using a pseudo-element */
+        body {
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./images/background8.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            filter: brightness(0.9);
+            /* You can adjust brightness/blur */
+            z-index: -1;
+        }
+
+        /* Centering content on the page */
+        .overlay-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 100px;
+            /* Space between images */
+            height: 100%;
+            /* Center vertically */
+            z-index: 1;
+            position: relative;
+        }
+
+        .overlay-image {
+            width: 250px;
+            /* Fixed width for uniform size */
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .overlay-image:hover {
+            transform: scale(1.05);
+        }
+
+        .arrow-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .arrow-button.left {
+            left: 10px;
+        }
+
+        .arrow-button.right {
+            right: 10px;
+        }
+
+        .arrow-button:focus {
+            outline: none;
+        }
+
+        .arrow-button img {
+            width: 60px;
+            height: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .arrow-button:hover img {
+            transform: scale(1.2);
+        }
+
+        h1 {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+            z-index: 2;
+        }
+
+        /* New styling for the birthdaykai image */
+        .birthday-image {
+            position: absolute;
+            bottom: -20px;
+            right: 120px;
+            width: 400px;
+            /* Adjust size as needed */
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="arrow-button left" onclick="location.href='page3.html'">
+        <img src="./images/black-left-arrow.png" alt="Left Arrow">
+    </button>
+    <button class="arrow-button right" onclick="location.href='page1.html'">
+        <img src="./images/black-right-arrow.png" alt="Right Arrow">
+    </button>
+
+    <!-- Birthday Kai image positioned near the bottom right -->
+    <img src="./images/birthdaykai.png" alt="Birthday Kai" class="birthday-image">
+
+    <script src="./renderer.js"></script>
+</body>
+
+</html>
